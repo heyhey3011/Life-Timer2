@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start life-timer.html)",
+      "Bash(powershell:*)",
+      "Bash(explorer:*)"
+    ],
+    "deny": []
+  }
+}
