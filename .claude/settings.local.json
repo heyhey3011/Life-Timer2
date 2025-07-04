@@ -3,7 +3,8 @@
     "allow": [
       "Bash(start life-timer.html)",
       "Bash(powershell:*)",
-      "Bash(explorer:*)"
+      "Bash(explorer:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
