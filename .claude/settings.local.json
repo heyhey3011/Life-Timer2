@@ -4,7 +4,8 @@
       "Bash(start life-timer.html)",
       "Bash(powershell:*)",
       "Bash(explorer:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
