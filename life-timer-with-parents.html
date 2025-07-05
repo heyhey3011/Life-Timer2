@@ -519,6 +519,61 @@
             box-shadow: 0 0 15px rgba(137, 247, 254, 0.3);
         }
 
+        .parent-input-group select {
+            width: 100%;
+            background-color: rgba(51, 51, 51, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f0f0f0;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .parent-input-group select:focus {
+            outline: none;
+            border-color: #89f7fe;
+            box-shadow: 0 0 15px rgba(137, 247, 254, 0.3);
+        }
+
+        .parent-input-group select option {
+            background-color: #333333;
+            color: #f0f0f0;
+            padding: 8px;
+        }
+
+        /* --- オプション選択ボタンのスタイル --- */
+        .option-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .option-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: transparent;
+            color: #b0b8d1;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            border-color: #89f7fe;
+            box-shadow: 0 0 15px rgba(137, 247, 254, 0.3);
+            color: #ffffff;
+        }
+
+        .option-btn.active {
+            background: linear-gradient(45deg, rgba(102, 166, 255, 0.3), rgba(137, 247, 254, 0.3));
+            border-color: #89f7fe;
+            color: #ffffff;
+            box-shadow: 0 0 25px rgba(137, 247, 254, 0.5);
+        }
+
         .parents-result-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -616,13 +671,19 @@
         .birthdate-select-group select {
             flex: 1;
             width: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #e0e0e0;
+            background-color: rgba(51, 51, 51, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f0f0f0;
             padding: 12px;
             border-radius: 10px;
             font-family: inherit;
             font-size: 1rem;
+        }
+        
+        .birthdate-select-group select option {
+            background-color: #333333;
+            color: #f0f0f0;
+            padding: 8px;
         }
 
         .birthdate-select-group select:focus {
@@ -906,19 +967,30 @@
             <form id="parentsForm" class="parents-form">
                 <div class="parent-input-group">
                     <label for="fatherAge">父の年齢</label>
-                    <input type="number" id="fatherAge" placeholder="例: 65">
+                    <select id="fatherAge"></select>
                 </div>
                 <div class="parent-input-group">
                     <label for="motherAge">母の年齢</label>
-                    <input type="number" id="motherAge" placeholder="例: 63">
+                    <select id="motherAge"></select>
                 </div>
                 <div class="parent-input-group">
-                    <label for="homecomingFrequency">帰省頻度 (年/回)</label>
-                    <input type="number" id="homecomingFrequency" placeholder="例: 2">
+                    <label>帰省頻度 (年/回)</label>
+                    <div class="option-buttons" id="frequencyButtons">
+                        <button type="button" class="option-btn" data-value="1">1</button>
+                        <button type="button" class="option-btn" data-value="2">2</button>
+                        <button type="button" class="option-btn" data-value="3">3</button>
+                        <button type="button" class="option-btn" data-value="4">4</button>
+                    </div>
                 </div>
                 <div class="parent-input-group">
-                    <label for="homecomingDays">滞在日数 (1回/日)</label>
-                    <input type="number" id="homecomingDays" placeholder="例: 3">
+                    <label>滞在日数 (1回/日)</label>
+                    <div class="option-buttons" id="daysButtons">
+                        <button type="button" class="option-btn" data-value="1">1</button>
+                        <button type="button" class="option-btn" data-value="2">2</button>
+                        <button type="button" class="option-btn" data-value="3">3</button>
+                        <button type="button" class="option-btn" data-value="4">4</button>
+                        <button type="button" class="option-btn" data-value="5">5</button>
+                    </div>
                 </div>
             </form>
             <div id="parentsResult" class="parents-result-container">
@@ -1050,16 +1122,24 @@
         // 新機能のDOM要素を取得
         const parentsForm = document.getElementById('parentsForm');
         const parentsResultContainer = document.getElementById('parentsResult');
+        const fatherAgeSelect = document.getElementById('fatherAge');
+        const motherAgeSelect = document.getElementById('motherAge');
+        const frequencyButtons = document.getElementById('frequencyButtons');
+        const daysButtons = document.getElementById('daysButtons');
 
-        // 新機能の入力フィールドにイベントリスナーを設定
-        parentsForm.addEventListener('input', calculateParentsTimer);
+        // 新機能の入力フィールドにイベントリスナーを設定（削除：新しいUI要素に個別に設定）
 
         function calculateParentsTimer() {
             // 入力値を取得
-            const fatherAge = parseFloat(document.getElementById('fatherAge').value) || 0;
-            const motherAge = parseFloat(document.getElementById('motherAge').value) || 0;
-            const homecomingFrequency = parseFloat(document.getElementById('homecomingFrequency').value) || 0;
-            const homecomingDays = parseFloat(document.getElementById('homecomingDays').value) || 0;
+            const fatherAge = parseFloat(fatherAgeSelect.value) || 0;
+            const motherAge = parseFloat(motherAgeSelect.value) || 0;
+            
+            // アクティブなボタンから値を取得
+            const frequencyButton = frequencyButtons.querySelector('.option-btn.active');
+            const daysButton = daysButtons.querySelector('.option-btn.active');
+            
+            const homecomingFrequency = frequencyButton ? parseFloat(frequencyButton.dataset.value) || 0 : 0;
+            const homecomingDays = daysButton ? parseFloat(daysButton.dataset.value) || 0 : 0;
 
             // すべての入力が揃っていない場合は結果をクリア
             if (!fatherAge || !motherAge || !homecomingFrequency || !homecomingDays) {
@@ -1380,6 +1460,52 @@
             const defaultYear = currentYear - 30;
             birthYearSlider.value = defaultYear;
             yearDisplay.textContent = defaultYear;
+            
+            // 親の年齢プルダウンの初期化
+            for (let age = 30; age <= 100; age++) {
+                const fatherOption = document.createElement('option');
+                fatherOption.value = age;
+                fatherOption.textContent = age + '歳';
+                if (age === 60) fatherOption.selected = true;
+                fatherAgeSelect.appendChild(fatherOption);
+                
+                const motherOption = document.createElement('option');
+                motherOption.value = age;
+                motherOption.textContent = age + '歳';
+                if (age === 60) motherOption.selected = true;
+                motherAgeSelect.appendChild(motherOption);
+            }
+            
+            // 親の年齢プルダウンにイベントリスナーを追加
+            fatherAgeSelect.addEventListener('change', calculateParentsTimer);
+            motherAgeSelect.addEventListener('change', calculateParentsTimer);
+            
+            // 帰省頻度・日数ボタンにイベントリスナーを追加
+            frequencyButtons.addEventListener('click', function(event) {
+                if (event.target.classList.contains('option-btn')) {
+                    // 兄弟ボタンからactiveクラスを削除
+                    frequencyButtons.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+                    // クリックされたボタンにactiveクラスを追加
+                    event.target.classList.add('active');
+                    // 計算実行
+                    calculateParentsTimer();
+                }
+            });
+            
+            daysButtons.addEventListener('click', function(event) {
+                if (event.target.classList.contains('option-btn')) {
+                    // 兄弟ボタンからactiveクラスを削除
+                    daysButtons.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+                    // クリックされたボタンにactiveクラスを追加
+                    event.target.classList.add('active');
+                    // 計算実行
+                    calculateParentsTimer();
+                }
+            });
+            
+            // デフォルト値の設定（帰省頻度2回、滞在日数3日）
+            frequencyButtons.querySelector('[data-value="2"]').classList.add('active');
+            daysButtons.querySelector('[data-value="3"]').classList.add('active');
             
             // 子供の生年月日ドロップダウンの初期化
             // 年のオプション（現在の年から遡って40年分）
