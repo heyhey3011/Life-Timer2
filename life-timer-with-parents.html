@@ -607,6 +607,30 @@
             font-size: 1rem;
         }
 
+        /* --- 生年月日ドロップダウンのスタイル --- */
+        .birthdate-select-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .birthdate-select-group select {
+            flex: 1;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .birthdate-select-group select:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+        }
+
         /* --- 子供の成長タイマーセクションのスタイル --- */
         .child-growth-timer-section {
             margin-top: 40px;
@@ -909,8 +933,12 @@
             </h3>
             <form id="childGrowthForm" class="child-growth-form">
                 <div class="child-input-group">
-                    <label for="childBirthDate">子供の生年月日</label>
-                    <input type="date" id="childBirthDate">
+                    <label for="childBirthYear">子供の生年月日</label>
+                    <div class="birthdate-select-group">
+                        <select id="childBirthYear"></select>
+                        <select id="childBirthMonth"></select>
+                        <select id="childBirthDay"></select>
+                    </div>
                 </div>
             </form>
             <div id="childGrowthResult" class="child-growth-result-container">
@@ -1064,11 +1092,10 @@
         // --- 子供の成長タイマーのロジック ---
 
         // 新機能のDOM要素を取得
-        const childBirthDateInput = document.getElementById('childBirthDate');
+        const childBirthYearSelect = document.getElementById('childBirthYear');
+        const childBirthMonthSelect = document.getElementById('childBirthMonth');
+        const childBirthDaySelect = document.getElementById('childBirthDay');
         const childGrowthResultContainer = document.getElementById('childGrowthResult');
-
-        // 生年月日入力にイベントリスナーを設定
-        childBirthDateInput.addEventListener('input', calculateChildGrowthTimer);
 
         // イベントの日付を計算するヘルパー関数
         function getEventDate(birthDate, age) {
@@ -1108,13 +1135,16 @@
         }
 
         function calculateChildGrowthTimer() {
-            const birthDateValue = childBirthDateInput.value;
-            if (!birthDateValue) {
+            const year = parseInt(childBirthYearSelect.value);
+            const month = parseInt(childBirthMonthSelect.value);
+            const day = parseInt(childBirthDaySelect.value);
+            
+            if (!year || !month || !day) {
                 childGrowthResultContainer.innerHTML = '';
                 return;
             }
 
-            const birthDate = new Date(birthDateValue);
+            const birthDate = new Date(year, month - 1, day);
             const now = new Date();
 
             const events = [
@@ -1233,8 +1263,8 @@
                 person.age >= (targetAge - 10) && person.age <= (targetAge + 5)
             );
             
-            // 年齢順にソート
-            nearbyGreats.sort((a, b) => Math.abs(a.age - targetAge) - Math.abs(b.age - targetAge));
+            // 享年が若い順にソート
+            nearbyGreats.sort((a, b) => a.age - b.age);
             
             // リストをクリア
             greatsList.innerHTML = '';
@@ -1307,6 +1337,37 @@
             shareBtn.href = twitterUrl;
         }
 
+        // 日付の連動機能（閏年対応）
+        function updateDayOptions() {
+            const year = parseInt(childBirthYearSelect.value);
+            const month = parseInt(childBirthMonthSelect.value);
+            
+            if (!year || !month) return;
+            
+            // 指定された年月の最終日を取得
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const currentDay = parseInt(childBirthDaySelect.value) || 1;
+            
+            // 日のオプションをクリア
+            childBirthDaySelect.innerHTML = '';
+            
+            // 新しい日のオプションを生成
+            for (let day = 1; day <= daysInMonth; day++) {
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = day + '日';
+                if (day === currentDay && day <= daysInMonth) {
+                    option.selected = true;
+                }
+                childBirthDaySelect.appendChild(option);
+            }
+            
+            // 選択されていた日が新しい月の日数を超える場合は最終日を選択
+            if (currentDay > daysInMonth) {
+                childBirthDaySelect.value = daysInMonth;
+            }
+        }
+
         // 初期化処理
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Cosmic Life Timer with Parents Timer and Child Growth Timer initialized');
@@ -1319,6 +1380,40 @@
             const defaultYear = currentYear - 30;
             birthYearSlider.value = defaultYear;
             yearDisplay.textContent = defaultYear;
+            
+            // 子供の生年月日ドロップダウンの初期化
+            // 年のオプション（現在の年から遡って40年分）
+            for (let year = currentYear; year >= currentYear - 40; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year + '年';
+                childBirthYearSelect.appendChild(option);
+            }
+            
+            // 月のオプション（1月から12月）
+            for (let month = 1; month <= 12; month++) {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month + '月';
+                childBirthMonthSelect.appendChild(option);
+            }
+            
+            // 日のオプション（初期状態として1日から31日）
+            for (let day = 1; day <= 31; day++) {
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = day + '日';
+                childBirthDaySelect.appendChild(option);
+            }
+            
+            // 年・月が変更された際に日のオプションを更新
+            childBirthYearSelect.addEventListener('change', updateDayOptions);
+            childBirthMonthSelect.addEventListener('change', updateDayOptions);
+            
+            // 3つのセレクトボックスのいずれかが変更された際に計算を実行
+            childBirthYearSelect.addEventListener('change', calculateChildGrowthTimer);
+            childBirthMonthSelect.addEventListener('change', calculateChildGrowthTimer);
+            childBirthDaySelect.addEventListener('change', calculateChildGrowthTimer);
         });
 
         // エラーハンドリング
