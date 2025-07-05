@@ -5,7 +5,9 @@
       "Bash(powershell:*)",
       "Bash(explorer:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)"
     ],
     "deny": []
   }
