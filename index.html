@@ -636,6 +636,20 @@
             box-shadow: 0 0 30px rgba(29, 161, 242, 0.6);
         }
 
+        .share-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .share-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
         .health-info {
             background: rgba(10, 20, 40, 0.4);
             backdrop-filter: blur(15px);
@@ -830,6 +844,15 @@
             .parents-result-container {
                 grid-template-columns: 1fr;
             }
+
+            .share-section {
+                flex-direction: column;
+            }
+
+            .share-btn {
+                width: 100%;
+                margin-right: 0 !important;
+            }
         }
 
         @media (max-width: 480px) {
@@ -957,6 +980,10 @@
             
             <!-- SNS共有セクション -->
             <div class="share-section">
+                <button id="screenshotBtn" class="share-btn" style="background: linear-gradient(45deg, #28a745, #20c997); margin-right: 15px;">
+                    <i class="fas fa-camera"></i>
+                    スクリーンショット
+                </button>
                 <a href="#" id="shareBtn" class="share-btn" target="_blank">
                     <i class="fab fa-twitter"></i>
                     結果をXで共有する
@@ -1556,6 +1583,59 @@
             childBirthMonthSelect.addEventListener('change', calculateChildGrowthTimer);
             childBirthDaySelect.addEventListener('change', calculateChildGrowthTimer);
         });
+
+        // スクリーンショット機能
+        document.getElementById('screenshotBtn').addEventListener('click', function() {
+            // html2canvasライブラリを動的に読み込み
+            if (!window.html2canvas) {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = function() {
+                    takeScreenshot();
+                };
+                document.head.appendChild(script);
+            } else {
+                takeScreenshot();
+            }
+        });
+
+        function takeScreenshot() {
+            const button = document.getElementById('screenshotBtn');
+            const originalText = button.innerHTML;
+            
+            // ボタンを処理中表示に変更
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+            button.disabled = true;
+            
+            // html2canvasでスクリーンショットを作成
+            html2canvas(document.body, {
+                allowTaint: true,
+                useCORS: true,
+                scale: 2, // 高解像度
+                backgroundColor: '#000000',
+                height: window.innerHeight,
+                width: window.innerWidth,
+                scrollX: 0,
+                scrollY: 0
+            }).then(function(canvas) {
+                // Canvasを画像として保存
+                const link = document.createElement('a');
+                link.download = `余命タイマー結果_${new Date().toISOString().slice(0, 10)}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // ボタンを元に戻す
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }).catch(function(error) {
+                console.error('スクリーンショット生成エラー:', error);
+                alert('スクリーンショットの生成に失敗しました。');
+                
+                // ボタンを元に戻す
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
 
         // エラーハンドリング
         window.addEventListener('error', function(e) {
