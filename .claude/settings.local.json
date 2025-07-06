@@ -7,7 +7,18 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(git remote set-url:*)"
+      "Bash(git remote set-url:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git config:*)",
+      "Bash(git checkout:*)",
+      "Bash(cp:*)",
+      "Bash(copy \"life-timer-cosmic.html\" \"life-timer-with-parents.html\")",
+      "Bash(rg:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(gh repo view:*)",
+      "Bash(git merge:*)"
     ],
     "deny": []
   }
